@@ -246,8 +246,29 @@ class SponsorBlockHandler {
 
       const skipName = barTypes[segment.category]?.name || segment.category;
       console.info(this.videoID, 'Skipping', segment);
-      showToast('SponsorBlock', `Skipping ${skipName}`);
-      this.video.currentTime = end;
+      const skipContainer = document.createElement('div');
+      skipContainer.style['position'] = 'absolute';
+      skipContainer.style['bottom'] = '40px';
+      skipContainer.style['right'] = '20px';
+      skipContainer.style['zIndex'] = '9999';
+
+      skipContainer.innerHTML += `<button id="skipButton">Skip ${skipName}</button>`;
+      document.querySelector('body').appendChild(skipContainer);
+
+      const removeSkipContainer = () => {
+        skipContainer.remove();
+      };
+
+      document.getElementById('skipButton').onclick = () => {
+        this.video.currentTime = end;
+        showNotification(`Skipping ${skipName}`);
+        removeSkipContainer();
+      };
+
+      setTimeout(() => {
+        removeSkipContainer();
+      }, (end - start) * 1000);
+
       this.scheduleSkip();
     }, (start - this.video.currentTime) * 1000);
   }
